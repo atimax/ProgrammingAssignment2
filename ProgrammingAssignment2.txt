@@ -1,0 +1,104 @@
+
+R version 3.4.1 (2017-06-30) -- "Single Candle"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[R.app GUI 1.70 (7375) x86_64-apple-darwin15.6.0]
+
+[History restored from /Users/DitFred/.Rapp.history]
+
+> ## These functions are used to create a special object that stores a ## matrix and caches its inverse
+> 
+> ## This Function creates a special "matrix" that caches its inverse        
+> 
+> 
+> makeCacheMatrix <- function(x = matrix()) {
++ 		inv <- NULL
++ 		set <- function(y) {
++ 			x <<- y
++ 			inv <<- NULL 
++ 		}
++ 		get <- function() x
++ 		setInverse <- function(inverse) inv <<- inverse
++ 		getInverse <- function() inv
++ 		list(set = set,
++ 			 get = get,
++ 			 setInverse = setInverse,
++ 			 getInverse = getInverse)
++ }
+> 
+> 
+> ## This function calculates the inverse of the special "matrix" created ## by the makeCacheMatrix above.
+> 
+> cacheSolve <- function(x, ...) {
++         ## Return a matrix that is the inverse of 'x'
++         inv <- x$getInverse()
++         if (!is.null(inv)) {
++         	message("getting cached data")
++         	return(inv)
++         }
++         mat <- x$get()
++         inv <- solve(mat, ...)
++         x$setInverse(inv)
++         inv
++ }
+> 
+> source("cachematrix.R")
+> my_matrix <- makeCacheMatrix(matrix(1:4, 2, 2))
+> my_matrix$get()
+     [,1] [,2]
+[1,]    1    3
+[2,]    2    4
+> my_matrix$getInverse()
+NULL
+> 
+> cacheSolve(my_matrix)
+     [,1] [,2]
+[1,]   -2  1.5
+[2,]    1 -0.5
+> caheSolve(my_matrix)
+Error in caheSolve(my_matrix) : could not find function "caheSolve"
+> cacheSolve(my_matrix)
+getting cached data
+     [,1] [,2]
+[1,]   -2  1.5
+[2,]    1 -0.5
+> my_matrix$getInverse()
+     [,1] [,2]
+[1,]   -2  1.5
+[2,]    1 -0.5
+> my_matrix$set(matrix(c(2, 2, 1,4), 2,2))
+> my_matrix$get()
+     [,1] [,2]
+[1,]    2    1
+[2,]    2    4
+> my_matrix$getInverse()
+NULL
+> cacheSolve(my_matrix)
+           [,1]       [,2]
+[1,]  0.6666667 -0.1666667
+[2,] -0.3333333  0.3333333
+> cacheSolve(my_matrix)
+getting cached data
+           [,1]       [,2]
+[1,]  0.6666667 -0.1666667
+[2,] -0.3333333  0.3333333
+> my_matrix$getInverse()
+           [,1]       [,2]
+[1,]  0.6666667 -0.1666667
+[2,] -0.3333333  0.3333333
+> 
